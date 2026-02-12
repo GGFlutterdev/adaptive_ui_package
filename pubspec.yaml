@@ -1,6 +1,6 @@
 name: adaptive_ui
 description: A Flutter package for adaptive UI that automatically switches between Material and Cupertino widgets based on platform.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/yourusername/adaptive_ui
 
 environment:

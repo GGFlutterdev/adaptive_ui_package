@@ -12,6 +12,7 @@ export 'src/widgets/adaptive_scaffold.dart';
 export 'src/widgets/adaptive_app_bar.dart';
 export 'src/widgets/adaptive_button.dart';
 export 'src/widgets/adaptive_text_field.dart';
+export 'src/widgets/adaptive_text_form_field.dart';
 export 'src/widgets/adaptive_switch.dart';
 export 'src/widgets/adaptive_slider.dart';
 export 'src/widgets/adaptive_list_tile.dart';

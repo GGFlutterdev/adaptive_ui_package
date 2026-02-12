@@ -1,4 +1,3 @@
-import 'package:adaptive_ui/adaptive_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
@@ -139,12 +138,12 @@ class _MaterialTabScaffoldState extends State<_MaterialTabScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
+    return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
         children: widget.children,
       ),
-      bottomNavigationBar: AdaptiveBottomNavBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
@@ -152,8 +151,14 @@ class _MaterialTabScaffoldState extends State<_MaterialTabScaffold> {
           });
         },
         backgroundColor: widget.backgroundColor,
-        activeColor: widget.activeColor,
-        items: widget.tabItems,
+        selectedItemColor: widget.activeColor,
+        items: widget.tabItems
+            .map((item) => BottomNavigationBarItem(
+                  icon: item.icon,
+                  activeIcon: item.activeIcon ?? item.icon,
+                  label: item.label,
+                ))
+            .toList(),
       ),
     );
   }
