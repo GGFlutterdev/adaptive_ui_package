@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:adaptive_ui/adaptive_ui.dart';
+import 'package:platform_adaptive_ui/platform_adaptive_ui.dart';
 
 void main() {
   runApp(const MyApp());

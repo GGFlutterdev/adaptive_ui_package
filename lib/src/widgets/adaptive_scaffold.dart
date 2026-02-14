@@ -1,7 +1,7 @@
-import 'package:adaptive_ui/adaptive_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
+import 'package:platform_adaptive_ui/platform_adaptive_ui.dart';
 
 /// Scaffold adattivo che sceglie tra Scaffold e CupertinoPageScaffold
 class AdaptiveScaffold extends StatelessWidget {
