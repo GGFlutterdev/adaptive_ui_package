@@ -23,8 +23,3 @@ All notable changes to this project will be documented in this file.
 - Complete theme configuration system (ThemeColors, TextThemeConfig, ButtonStyles, etc.)
 - AdaptiveThemeProvider for accessing theme throughout the app
 - Comprehensive documentation and examples
-
-## [1.0.1] - 2026-02-14
-
-### Added
-- AdaptiveTextFormField widget (TextFormField / CupertinoTextFormFieldRow)
