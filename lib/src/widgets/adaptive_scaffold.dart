@@ -27,7 +27,7 @@ class AdaptiveScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isIOS) {
       return CupertinoPageScaffold(
-        navigationBar: appBar?.buildCupertinoNavigationBar(),
+        navigationBar: appBar?.buildCupertinoNavigationBar(context),
         child: _buildCupertinoChild(context),
       );
     } else {

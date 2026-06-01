@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
+import '../theme/adaptive_theme_provider.dart';
 
 /// AppBar adattiva che sceglie automaticamente tra:
 /// - [AppBar] su Android e altre piattaforme Material
@@ -18,8 +19,15 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// Widget mostrato sulla sinistra (tipicamente back button o menu)
   final Widget? leading;
 
-  /// Colore di sfondo dell'AppBar / NavigationBar
+  /// Colore di sfondo dell'AppBar / NavigationBar.
+  ///
+  /// Se null, viene usato il colore `surface` del tema corrente.
   final Color? backgroundColor;
+
+  /// Colore di testo e icone dell'AppBar / NavigationBar.
+  ///
+  /// Se null, viene usato il colore `onSurface` del tema corrente.
+  final Color? foregroundColor;
 
   /// Se true, mostra automaticamente il pulsante di back quando necessario
   final bool automaticallyImplyLeading;
@@ -30,38 +38,68 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.backgroundColor,
+    this.foregroundColor,
     this.automaticallyImplyLeading = true,
   }) : super(key: key);
 
   /// Ritorna true se la piattaforma corrente è iOS
   static bool get isIOS => Platform.isIOS;
 
+  /// Colore di sfondo effettivo: quello esplicito o, in mancanza, il
+  /// `surface` del tema corrente.
+  Color _effectiveBackgroundColor(BuildContext context) =>
+      backgroundColor ?? AdaptiveThemeProvider.colorsOf(context).surface;
+
+  /// Colore di testo/icone effettivo: quello esplicito o, in mancanza, il
+  /// `onSurface` del tema corrente.
+  Color _effectiveForegroundColor(BuildContext context) =>
+      foregroundColor ?? AdaptiveThemeProvider.colorsOf(context).onSurface;
+
+  /// Applica [color] come colore di default per testo e icone di [child].
+  ///
+  /// Necessario su iOS, dove [CupertinoNavigationBar] non espone una
+  /// proprietà per colorare direttamente i propri contenuti.
+  Widget _tint(Widget child, Color color) {
+    return IconTheme.merge(
+      data: IconThemeData(color: color),
+      child: DefaultTextStyle.merge(
+        style: TextStyle(color: color),
+        child: child,
+      ),
+    );
+  }
+
   /// Costruisce la [CupertinoNavigationBar] equivalente a questa AppBar.
   ///
   /// Utile per [CupertinoPageScaffold.navigationBar], che richiede un
   /// [ObstructingPreferredSizeWidget] e non accetta direttamente questo wrapper.
-  CupertinoNavigationBar buildCupertinoNavigationBar() {
+  CupertinoNavigationBar buildCupertinoNavigationBar(BuildContext context) {
+    final Color foreground = _effectiveForegroundColor(context);
     return CupertinoNavigationBar(
-      middle: title,
+      middle: _tint(title, foreground),
       trailing: actions != null && actions!.isNotEmpty
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: actions!,
+          ? _tint(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: actions!,
+              ),
+              foreground,
             )
           : null,
-      leading: leading,
-      backgroundColor: backgroundColor,
+      leading: leading != null ? _tint(leading!, foreground) : null,
+      backgroundColor: _effectiveBackgroundColor(context),
       automaticallyImplyLeading: automaticallyImplyLeading,
     );
   }
 
   /// Costruisce la [AppBar] Material equivalente a questa AppBar.
-  AppBar buildMaterialAppBar() {
+  AppBar buildMaterialAppBar(BuildContext context) {
     return AppBar(
       title: title,
       actions: actions,
       leading: leading,
-      backgroundColor: backgroundColor,
+      backgroundColor: _effectiveBackgroundColor(context),
+      foregroundColor: _effectiveForegroundColor(context),
       automaticallyImplyLeading: automaticallyImplyLeading,
     );
   }
@@ -69,9 +107,9 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     if (isIOS) {
-      return buildCupertinoNavigationBar();
+      return buildCupertinoNavigationBar(context);
     } else {
-      return buildMaterialAppBar();
+      return buildMaterialAppBar(context);
     }
   }
 

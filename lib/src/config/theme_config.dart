@@ -9,6 +9,12 @@ class ThemeColors {
   final Color onSecondary;
   final Color background;
   final Color surface;
+
+  /// Colore di testo e icone mostrati sopra [surface].
+  ///
+  /// Usato come default per il contenuto di AppBar/NavigationBar quando non
+  /// viene specificato un colore esplicito.
+  final Color onSurface;
   final Color error;
 
   const ThemeColors({
@@ -18,6 +24,7 @@ class ThemeColors {
     required this.onSecondary,
     required this.background,
     required this.surface,
+    this.onSurface = Colors.black,
     required this.error,
   });
 
@@ -29,6 +36,7 @@ class ThemeColors {
     onSecondary: Colors.black,
     background: Colors.white,
     surface: Colors.white,
+    onSurface: Colors.black,
     error: Color(0xFFB00020),
   );
 }
@@ -156,10 +164,19 @@ class InputStyles {
   ///
   /// Usa il raggio e il colore del bordo configurati; passa [focused] true
   /// per applicare l'aspetto del [focusedBorder].
-  BoxDecoration toCupertinoDecoration({bool focused = false}) {
+  ///
+  /// Se [fillColor] non è specificato, viene usato [defaultFillColor] (di
+  /// norma il `surface` del tema corrente) e, in ultima istanza,
+  /// [CupertinoColors.tertiarySystemBackground].
+  BoxDecoration toCupertinoDecoration({
+    bool focused = false,
+    Color? defaultFillColor,
+  }) {
     final OutlineInputBorder activeBorder = focused ? focusedBorder : border;
     return BoxDecoration(
-      color: fillColor ?? CupertinoColors.tertiarySystemBackground,
+      color: fillColor ??
+          defaultFillColor ??
+          CupertinoColors.tertiarySystemBackground,
       borderRadius: activeBorder.borderRadius,
       border: Border.all(
         color: activeBorder.borderSide.color,

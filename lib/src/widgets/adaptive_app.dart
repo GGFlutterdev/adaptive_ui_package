@@ -66,7 +66,7 @@ class AdaptiveApp extends StatelessWidget {
           error: colors.error,
           onPrimary: colors.onPrimary,
           onSecondary: colors.onSecondary,
-          onSurface: Colors.black,
+          onSurface: colors.onSurface,
           onError: Colors.white,
           brightness: Brightness.light,
         ),
