@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2026-06-01 - Fix localizzazioni Material su iOS
+
+### Fixed
+- I widget Material aperti come route su iOS (`showDialog`, `showModalBottomSheet`, i selection controls dei `TextField`, ecc.) non vanno più in crash con "No MaterialLocalizations found": la `CupertinoApp` interna accoda ora `DefaultMaterialLocalizations`, `DefaultCupertinoLocalizations` e `DefaultWidgetsLocalizations`.
+- Gli `SnackBar` Material funzionano anche su iOS: la `CupertinoApp` ora monta uno `ScaffoldMessenger` sopra il Navigator radice (come fa automaticamente `MaterialApp`).
+
+### Added
+- `AdaptiveApp` espone `localizationsDelegates`, `supportedLocales` e `locale`, inoltrati a entrambi i rami (Material e Cupertino). Nel ramo Cupertino i delegate del consumer vengono accodati ai default.
+
 ## [1.2.0] - 2026-06-01 - Dark Mode
 
 ### Added

@@ -32,6 +32,20 @@ class AdaptiveApp extends StatelessWidget {
   /// Modalità del tema: chiaro, scuro o in base al sistema (default).
   final ThemeMode themeMode;
 
+  /// Delegate di localizzazione forniti dal consumer.
+  ///
+  /// Vengono inoltrati a entrambi i rami; nel ramo Cupertino i delegate
+  /// Material/Cupertino/Widgets di default vengono comunque accodati, così i
+  /// widget Material (dialog, bottom sheet, selection controls) funzionano
+  /// anche su iOS.
+  final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
+
+  /// Locale supportati dall'app.
+  final Iterable<Locale> supportedLocales;
+
+  /// Locale forzato; se null segue il sistema.
+  final Locale? locale;
+
   final Map<String, WidgetBuilder>? routes;
   final bool debugShowCheckedModeBanner;
 
@@ -53,6 +67,9 @@ class AdaptiveApp extends StatelessWidget {
     this.theme,
     this.darkTheme,
     this.themeMode = ThemeMode.system,
+    this.localizationsDelegates,
+    this.supportedLocales = const <Locale>[Locale('en', 'US')],
+    this.locale,
     this.routes,
     this.debugShowCheckedModeBanner = true,
   }) : super(key: key);
@@ -106,6 +123,9 @@ class AdaptiveApp extends StatelessWidget {
       theme: _buildMaterialTheme(_lightData),
       darkTheme: _buildMaterialTheme(_darkData),
       themeMode: themeMode,
+      localizationsDelegates: localizationsDelegates,
+      supportedLocales: supportedLocales,
+      locale: locale,
       builder: (context, child) {
         return AdaptiveThemeProvider(
           data: _activeData(context),
@@ -130,13 +150,30 @@ class AdaptiveApp extends StatelessWidget {
                 : Brightness.light),
         primaryColor: _lightData.colors.primary,
       ),
+      // Accoda i delegate di default: senza questi i widget Material aperti
+      // come route (dialog, bottom sheet, selection controls dei TextField)
+      // vanno in crash con "No MaterialLocalizations found" su iOS.
+      // I duplicati di tipo non danno problemi: vince il primo delegate.
+      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+        ...?localizationsDelegates,
+        DefaultMaterialLocalizations.delegate,
+        DefaultCupertinoLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: supportedLocales,
+      locale: locale,
       builder: (context, child) {
         final active = _activeData(context);
         return AdaptiveThemeProvider(
           data: active,
           child: CupertinoTheme(
             data: _buildCupertinoTheme(active),
-            child: child ?? const SizedBox.shrink(),
+            // CupertinoApp non fornisce uno ScaffoldMessenger: senza, gli
+            // SnackBar Material falliscono su iOS. Lo aggiungiamo qui, sopra
+            // il Navigator radice, una volta per tutte le route.
+            child: ScaffoldMessenger(
+              child: child ?? const SizedBox.shrink(),
+            ),
           ),
         );
       },
