@@ -1,25 +1,66 @@
 import 'package:flutter/material.dart';
 import '../config/theme_config.dart';
 
-/// Provider del tema adattivo
+/// Provider del tema adattivo.
+///
+/// Propaga ai widget discendenti il set di token [AdaptiveThemeData]
+/// attualmente attivo (light o dark, in base alla luminosità risolta da
+/// [AdaptiveApp]). I widget leggono da qui colori, stili input, spacing, ecc.
 class AdaptiveThemeProvider extends InheritedWidget {
-  final ThemeColors colors;
-  final TextThemeConfig textTheme;
-  final ButtonStyles? buttonStyles;
-  final CupertinoButtonStyles cupertinoButtonStyles;
-  final InputStyles inputStyles;
-  final Spacing spacing;
+  /// Set completo di token attualmente attivo.
+  final AdaptiveThemeData data;
 
-  const AdaptiveThemeProvider({
+  AdaptiveThemeProvider({
     Key? key,
-    required this.colors,
-    required this.textTheme,
-    this.buttonStyles,
-    required this.cupertinoButtonStyles,
-    required this.inputStyles,
-    required this.spacing,
+    required this.data,
     required Widget child,
   }) : super(key: key, child: child);
+
+  /// Costruttore di compatibilità basato sui singoli token.
+  ///
+  /// Permette di costruire il provider passando i token separati invece di un
+  /// [AdaptiveThemeData] già composto.
+  AdaptiveThemeProvider.fromParts({
+    Key? key,
+    required ThemeColors colors,
+    required TextThemeConfig textTheme,
+    ButtonStyles? buttonStyles,
+    required CupertinoButtonStyles cupertinoButtonStyles,
+    required InputStyles inputStyles,
+    required Spacing spacing,
+    Brightness brightness = Brightness.light,
+    required Widget child,
+  }) : data = AdaptiveThemeData(
+          colors: colors,
+          textTheme: textTheme,
+          buttonStyles: buttonStyles,
+          cupertinoButtonStyles: cupertinoButtonStyles,
+          inputStyles: inputStyles,
+          spacing: spacing,
+          brightness: brightness,
+        ),
+        super(key: key, child: child);
+
+  /// Palette attiva.
+  ThemeColors get colors => data.colors;
+
+  /// Configurazione testuale attiva.
+  TextThemeConfig get textTheme => data.textTheme;
+
+  /// Stili dei bottoni Material attivi.
+  ButtonStyles? get buttonStyles => data.buttonStyles;
+
+  /// Stili dei bottoni Cupertino attivi.
+  CupertinoButtonStyles get cupertinoButtonStyles => data.cupertinoButtonStyles;
+
+  /// Stili degli input attivi.
+  InputStyles get inputStyles => data.inputStyles;
+
+  /// Spaziature attive.
+  Spacing get spacing => data.spacing;
+
+  /// Luminosità attiva.
+  Brightness get brightness => data.brightness;
 
   static AdaptiveThemeProvider of(BuildContext context) {
     final AdaptiveThemeProvider? result =
@@ -35,6 +76,10 @@ class AdaptiveThemeProvider extends InheritedWidget {
   static AdaptiveThemeProvider? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<AdaptiveThemeProvider>();
   }
+
+  /// Tema completo attivo, con fallback al tema chiaro di default.
+  static AdaptiveThemeData dataOf(BuildContext context) =>
+      maybeOf(context)?.data ?? AdaptiveThemeData.light;
 
   /// Colori del tema, con fallback ai default se non c'è provider.
   static ThemeColors colorsOf(BuildContext context) =>
@@ -55,11 +100,6 @@ class AdaptiveThemeProvider extends InheritedWidget {
 
   @override
   bool updateShouldNotify(AdaptiveThemeProvider oldWidget) {
-    return colors != oldWidget.colors ||
-        textTheme != oldWidget.textTheme ||
-        buttonStyles != oldWidget.buttonStyles ||
-        cupertinoButtonStyles != oldWidget.cupertinoButtonStyles ||
-        inputStyles != oldWidget.inputStyles ||
-        spacing != oldWidget.spacing;
+    return data != oldWidget.data;
   }
 }

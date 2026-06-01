@@ -28,7 +28,7 @@ class ThemeColors {
     required this.error,
   });
 
-  /// Tema di default
+  /// Palette di default (light)
   static const ThemeColors defaultColors = ThemeColors(
     primary: Color(0xFF6200EE),
     onPrimary: Colors.white,
@@ -39,6 +39,41 @@ class ThemeColors {
     onSurface: Colors.black,
     error: Color(0xFFB00020),
   );
+
+  /// Palette di default (dark)
+  static const ThemeColors defaultDarkColors = ThemeColors(
+    primary: Color(0xFFBB86FC),
+    onPrimary: Colors.black,
+    secondary: Color(0xFF03DAC6),
+    onSecondary: Colors.black,
+    background: Color(0xFF121212),
+    surface: Color(0xFF1E1E1E),
+    onSurface: Colors.white,
+    error: Color(0xFFCF6679),
+  );
+
+  /// Crea una copia di questi colori sovrascrivendo i campi indicati.
+  ThemeColors copyWith({
+    Color? primary,
+    Color? onPrimary,
+    Color? secondary,
+    Color? onSecondary,
+    Color? background,
+    Color? surface,
+    Color? onSurface,
+    Color? error,
+  }) {
+    return ThemeColors(
+      primary: primary ?? this.primary,
+      onPrimary: onPrimary ?? this.onPrimary,
+      secondary: secondary ?? this.secondary,
+      onSecondary: onSecondary ?? this.onSecondary,
+      background: background ?? this.background,
+      surface: surface ?? this.surface,
+      onSurface: onSurface ?? this.onSurface,
+      error: error ?? this.error,
+    );
+  }
 }
 
 /// Configurazione del tema testuale
@@ -145,6 +180,43 @@ class InputStyles {
     suffixIcon: null,
   );
 
+  /// Stili di default per la dark mode
+  static final InputStyles defaultDarkStyles = InputStyles(
+    label: const TextStyle(fontSize: 14, color: Colors.white70),
+    hint: const TextStyle(fontSize: 14, color: Colors.white54),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Colors.white24),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: const BorderSide(color: Color(0xFFBB86FC), width: 2),
+    ),
+    prefixIcon: null,
+    suffixIcon: null,
+  );
+
+  /// Crea una copia di questi stili sovrascrivendo i campi indicati.
+  InputStyles copyWith({
+    TextStyle? label,
+    TextStyle? hint,
+    OutlineInputBorder? border,
+    OutlineInputBorder? focusedBorder,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    Color? fillColor,
+  }) {
+    return InputStyles(
+      label: label ?? this.label,
+      hint: hint ?? this.hint,
+      border: border ?? this.border,
+      focusedBorder: focusedBorder ?? this.focusedBorder,
+      prefixIcon: prefixIcon ?? this.prefixIcon,
+      suffixIcon: suffixIcon ?? this.suffixIcon,
+      fillColor: fillColor ?? this.fillColor,
+    );
+  }
+
   /// Metodo helper per creare InputDecoration
   InputDecoration decoration({String? hintText, String? labelText}) {
     return InputDecoration(
@@ -210,4 +282,84 @@ class Spacing {
     lg: 24.0,
     xl: 32.0,
   );
+}
+
+/// Insieme completo di token di stile per una singola modalità (light o dark).
+///
+/// Raggruppa palette, font e stili dei componenti in un unico oggetto, così
+/// da poter passare a [AdaptiveApp] una configurazione separata per la light
+/// mode e una per la dark mode.
+class AdaptiveThemeData {
+  /// Palette dei colori.
+  final ThemeColors colors;
+
+  /// Configurazione testuale (font, dimensioni, pesi).
+  final TextThemeConfig textTheme;
+
+  /// Stili dei bottoni Material (opzionali).
+  final ButtonStyles? buttonStyles;
+
+  /// Stili dei bottoni Cupertino.
+  final CupertinoButtonStyles cupertinoButtonStyles;
+
+  /// Stili dei campi di input.
+  final InputStyles inputStyles;
+
+  /// Spaziature.
+  final Spacing spacing;
+
+  /// Luminosità a cui appartiene questo set di token.
+  final Brightness brightness;
+
+  const AdaptiveThemeData({
+    required this.colors,
+    required this.textTheme,
+    this.buttonStyles,
+    required this.cupertinoButtonStyles,
+    required this.inputStyles,
+    required this.spacing,
+    this.brightness = Brightness.light,
+  });
+
+  /// Tema chiaro di default del package.
+  static final AdaptiveThemeData light = AdaptiveThemeData(
+    colors: ThemeColors.defaultColors,
+    textTheme: TextThemeConfig.defaultConfig,
+    cupertinoButtonStyles: CupertinoButtonStyles.defaultStyles,
+    inputStyles: InputStyles.defaultStyles,
+    spacing: Spacing.defaultSpacing,
+    brightness: Brightness.light,
+  );
+
+  /// Tema scuro di default del package.
+  static final AdaptiveThemeData dark = AdaptiveThemeData(
+    colors: ThemeColors.defaultDarkColors,
+    textTheme: TextThemeConfig.defaultConfig,
+    cupertinoButtonStyles: CupertinoButtonStyles.defaultStyles,
+    inputStyles: InputStyles.defaultDarkStyles,
+    spacing: Spacing.defaultSpacing,
+    brightness: Brightness.dark,
+  );
+
+  /// Crea una copia di questo tema sovrascrivendo i campi indicati.
+  AdaptiveThemeData copyWith({
+    ThemeColors? colors,
+    TextThemeConfig? textTheme,
+    ButtonStyles? buttonStyles,
+    CupertinoButtonStyles? cupertinoButtonStyles,
+    InputStyles? inputStyles,
+    Spacing? spacing,
+    Brightness? brightness,
+  }) {
+    return AdaptiveThemeData(
+      colors: colors ?? this.colors,
+      textTheme: textTheme ?? this.textTheme,
+      buttonStyles: buttonStyles ?? this.buttonStyles,
+      cupertinoButtonStyles:
+          cupertinoButtonStyles ?? this.cupertinoButtonStyles,
+      inputStyles: inputStyles ?? this.inputStyles,
+      spacing: spacing ?? this.spacing,
+      brightness: brightness ?? this.brightness,
+    );
+  }
 }

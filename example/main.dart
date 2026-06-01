@@ -55,6 +55,33 @@ class MyApp extends StatelessWidget {
         lg: 24.0,
         xl: 32.0,
       ),
+      // Tema scuro completo: palette, font e stili dedicati alla dark mode.
+      // `themeMode: system` fa seguire automaticamente l'impostazione del
+      // dispositivo. Gli `Adaptive*` widget commutano i colori di conseguenza.
+      darkTheme: AdaptiveThemeData(
+        colors: ThemeColors.defaultDarkColors,
+        textTheme: const TextThemeConfig(
+          fontFamily: 'Roboto',
+          headline: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          body: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+          caption: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+          button: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        ),
+        cupertinoButtonStyles: CupertinoButtonStyles.defaultStyles,
+        inputStyles: InputStyles.defaultDarkStyles.copyWith(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.white24),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFBB86FC), width: 2),
+          ),
+        ),
+        spacing: Spacing.defaultSpacing,
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.system,
       home: const ExampleHomePage(),
     );
   }

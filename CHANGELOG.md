@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-06-01 - Dark Mode
+
+### Added
+- Dark mode completa: `AdaptiveApp` accetta ora `darkTheme` (`AdaptiveThemeData`) e `themeMode` (`ThemeMode.system` di default). I token della modalità attiva vengono propagati ai widget `Adaptive*` e commutano automaticamente al variare della luminosità di sistema (Material e Cupertino).
+- Nuova classe `AdaptiveThemeData` che raggruppa palette, font e stili dei componenti in un unico set di token per modalità (con `copyWith` e i default `AdaptiveThemeData.light` / `AdaptiveThemeData.dark`).
+- `AdaptiveApp.theme`: tema chiaro completo come alternativa ai singoli parametri.
+- Default per la dark mode: `ThemeColors.defaultDarkColors`, `InputStyles.defaultDarkStyles`.
+- `copyWith` su `ThemeColors` e `InputStyles`; `AdaptiveThemeProvider.dataOf` e i getter `data`/`brightness`.
+- `AdaptiveTextField`/`AdaptiveFormField`: parametro `style` per il testo digitato (default `bodyMedium` del tema).
+
+### Changed
+- `AdaptiveThemeProvider` ora incapsula un `AdaptiveThemeData`; i getter `colors`, `textTheme`, `spacing`, ecc. restano disponibili (retrocompatibile).
+- `TextField`/`TextFormField` (Material e Cupertino): se non specificato, il `fillColor` usa il `surface` del tema; testo di default `bodyMedium`.
+- `AdaptiveAppBar`: se non specificati, sfondo = `surface` e testo/icone = `onSurface` del tema; nuovo parametro `foregroundColor`.
+
 ## [1.1.0] - 2026-06-01 - Aggiornamento Stile iOS
 
 ### Fixed
