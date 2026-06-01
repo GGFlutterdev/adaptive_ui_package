@@ -36,29 +36,42 @@ class AdaptiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// Ritorna true se la piattaforma corrente è iOS
   static bool get isIOS => Platform.isIOS;
 
+  /// Costruisce la [CupertinoNavigationBar] equivalente a questa AppBar.
+  ///
+  /// Utile per [CupertinoPageScaffold.navigationBar], che richiede un
+  /// [ObstructingPreferredSizeWidget] e non accetta direttamente questo wrapper.
+  CupertinoNavigationBar buildCupertinoNavigationBar() {
+    return CupertinoNavigationBar(
+      middle: title,
+      trailing: actions != null && actions!.isNotEmpty
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: actions!,
+            )
+          : null,
+      leading: leading,
+      backgroundColor: backgroundColor,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+    );
+  }
+
+  /// Costruisce la [AppBar] Material equivalente a questa AppBar.
+  AppBar buildMaterialAppBar() {
+    return AppBar(
+      title: title,
+      actions: actions,
+      leading: leading,
+      backgroundColor: backgroundColor,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isIOS) {
-      return CupertinoNavigationBar(
-        middle: title,
-        trailing: actions != null && actions!.isNotEmpty
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: actions!,
-              )
-            : null,
-        leading: leading,
-        backgroundColor: backgroundColor,
-        automaticallyImplyLeading: automaticallyImplyLeading,
-      );
+      return buildCupertinoNavigationBar();
     } else {
-      return AppBar(
-        title: title,
-        actions: actions,
-        leading: leading,
-        backgroundColor: backgroundColor,
-        automaticallyImplyLeading: automaticallyImplyLeading,
-      );
+      return buildMaterialAppBar();
     }
   }
 
