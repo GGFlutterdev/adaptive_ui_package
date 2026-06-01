@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/adaptive_theme_provider.dart';
 
 /// Switch adattivo - usa sempre Switch.adaptive per adattarsi alla piattaforma
 class AdaptiveSwitch extends StatelessWidget {
@@ -15,11 +16,13 @@ class AdaptiveSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent =
+        activeColor ?? AdaptiveThemeProvider.colorsOf(context).primary;
     return Switch.adaptive(
       value: value,
       onChanged: onChanged,
-      activeThumbColor: activeColor,
-      activeTrackColor: activeColor,
+      activeThumbColor: accent,
+      activeTrackColor: accent,
     );
   }
 }

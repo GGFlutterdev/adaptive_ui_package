@@ -28,6 +28,31 @@ class AdaptiveThemeProvider extends InheritedWidget {
     return result!;
   }
 
+  /// Variante non-throwing: restituisce null se nessun provider è presente.
+  ///
+  /// Permette ai widget di funzionare anche senza [AdaptiveApp], ricadendo
+  /// sui valori di default tramite gli accessor sottostanti.
+  static AdaptiveThemeProvider? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<AdaptiveThemeProvider>();
+  }
+
+  /// Colori del tema, con fallback ai default se non c'è provider.
+  static ThemeColors colorsOf(BuildContext context) =>
+      maybeOf(context)?.colors ?? ThemeColors.defaultColors;
+
+  /// Stili degli input, con fallback ai default se non c'è provider.
+  static InputStyles inputStylesOf(BuildContext context) =>
+      maybeOf(context)?.inputStyles ?? InputStyles.defaultStyles;
+
+  /// Stili dei bottoni Cupertino, con fallback ai default se non c'è provider.
+  static CupertinoButtonStyles cupertinoButtonStylesOf(BuildContext context) =>
+      maybeOf(context)?.cupertinoButtonStyles ??
+      CupertinoButtonStyles.defaultStyles;
+
+  /// Configurazione testuale, con fallback ai default se non c'è provider.
+  static TextThemeConfig textThemeOf(BuildContext context) =>
+      maybeOf(context)?.textTheme ?? TextThemeConfig.defaultConfig;
+
   @override
   bool updateShouldNotify(AdaptiveThemeProvider oldWidget) {
     return colors != oldWidget.colors ||

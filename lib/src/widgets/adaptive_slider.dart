@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
+import '../theme/adaptive_theme_provider.dart';
 
 /// Slider adattivo (Slider / CupertinoSlider)
 class AdaptiveSlider extends StatelessWidget {
@@ -25,6 +26,9 @@ class AdaptiveSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent =
+        activeColor ?? AdaptiveThemeProvider.colorsOf(context).primary;
+
     if (isIOS) {
       return CupertinoSlider(
         value: value,
@@ -32,7 +36,7 @@ class AdaptiveSlider extends StatelessWidget {
         min: min,
         max: max,
         divisions: divisions,
-        activeColor: activeColor ?? CupertinoColors.activeBlue,
+        activeColor: accent,
       );
     } else {
       return Slider(
@@ -41,7 +45,7 @@ class AdaptiveSlider extends StatelessWidget {
         min: min,
         max: max,
         divisions: divisions,
-        activeColor: activeColor,
+        activeColor: accent,
       );
     }
   }

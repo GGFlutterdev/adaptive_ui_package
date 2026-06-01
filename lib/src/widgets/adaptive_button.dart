@@ -33,14 +33,15 @@ class AdaptiveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = AdaptiveThemeProvider.of(context);
+    final cupertinoStyles =
+        AdaptiveThemeProvider.cupertinoButtonStylesOf(context);
     final defaultStyle = textStyle ?? Theme.of(context).textTheme.bodyMedium!;
 
     if (isIOS) {
       return CupertinoButton(
         onPressed: onPressed,
-        color: color ?? theme.cupertinoButtonStyles.primaryColor,
-        padding: padding ?? theme.cupertinoButtonStyles.padding,
+        color: color ?? cupertinoStyles.primaryColor,
+        padding: padding ?? cupertinoStyles.padding,
         child: DefaultTextStyle(
           style: defaultStyle.copyWith(color: Colors.white),
           child: child,
@@ -79,9 +80,10 @@ class AdaptiveTextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = AdaptiveThemeProvider.colorsOf(context).primary;
     final defaultStyle = textStyle ??
         Theme.of(context).textTheme.bodyMedium!.copyWith(
-              color: color ?? (isIOS ? CupertinoColors.activeBlue : null),
+              color: color ?? (isIOS ? accent : null),
             );
 
     if (isIOS) {
@@ -125,12 +127,13 @@ class AdaptiveIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isIOS) {
+      final accent = AdaptiveThemeProvider.colorsOf(context).primary;
       return CupertinoButton(
         onPressed: onPressed,
         padding: EdgeInsets.zero,
         child: IconTheme(
           data: IconThemeData(
-            color: color ?? CupertinoColors.activeBlue,
+            color: color ?? accent,
             size: size,
           ),
           child: icon,

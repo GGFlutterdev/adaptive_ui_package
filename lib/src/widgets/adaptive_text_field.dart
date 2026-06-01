@@ -30,6 +30,8 @@ class AdaptiveTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inputStyles = AdaptiveThemeProvider.inputStylesOf(context);
+
     if (isIOS) {
       return CupertinoTextField(
         controller: controller,
@@ -39,13 +41,13 @@ class AdaptiveTextField extends StatelessWidget {
         onChanged: onChanged,
         maxLines: maxLines,
         padding: padding ?? const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: CupertinoColors.tertiarySystemBackground,
-          borderRadius: BorderRadius.circular(8),
-        ),
+        style: inputStyles.label,
+        placeholderStyle: inputStyles.hint,
+        prefix: inputStyles.prefixIcon,
+        suffix: inputStyles.suffixIcon,
+        decoration: inputStyles.toCupertinoDecoration(),
       );
     } else {
-      final theme = AdaptiveThemeProvider.of(context);
       return TextField(
         controller: controller,
         keyboardType: keyboardType,
@@ -55,10 +57,12 @@ class AdaptiveTextField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
           hintText: placeholder,
-          labelStyle: theme.inputStyles.label,
-          hintStyle: theme.inputStyles.hint,
-          border: theme.inputStyles.border,
-          focusedBorder: theme.inputStyles.focusedBorder,
+          labelStyle: inputStyles.label,
+          hintStyle: inputStyles.hint,
+          border: inputStyles.border,
+          focusedBorder: inputStyles.focusedBorder,
+          prefixIcon: inputStyles.prefixIcon,
+          suffixIcon: inputStyles.suffixIcon,
           contentPadding: padding ?? const EdgeInsets.all(12),
         ),
       );

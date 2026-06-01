@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 /// Configurazione dei colori del tema
 class ThemeColors {
@@ -105,6 +106,11 @@ class InputStyles {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
 
+  /// Colore di riempimento dei campi (usato su iOS/Cupertino).
+  ///
+  /// Se null, su iOS si usa [CupertinoColors.tertiarySystemBackground].
+  final Color? fillColor;
+
   const InputStyles({
     required this.label,
     required this.hint,
@@ -112,6 +118,7 @@ class InputStyles {
     required this.focusedBorder,
     this.prefixIcon,
     this.suffixIcon,
+    this.fillColor,
   });
 
   /// Stili di default
@@ -141,6 +148,23 @@ class InputStyles {
       focusedBorder: focusedBorder,
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,
+    );
+  }
+
+  /// Deriva una [BoxDecoration] coerente con questi stili, per i campi
+  /// Cupertino (iOS) che non accettano un [InputDecoration].
+  ///
+  /// Usa il raggio e il colore del bordo configurati; passa [focused] true
+  /// per applicare l'aspetto del [focusedBorder].
+  BoxDecoration toCupertinoDecoration({bool focused = false}) {
+    final OutlineInputBorder activeBorder = focused ? focusedBorder : border;
+    return BoxDecoration(
+      color: fillColor ?? CupertinoColors.tertiarySystemBackground,
+      borderRadius: activeBorder.borderRadius,
+      border: Border.all(
+        color: activeBorder.borderSide.color,
+        width: activeBorder.borderSide.width,
+      ),
     );
   }
 }

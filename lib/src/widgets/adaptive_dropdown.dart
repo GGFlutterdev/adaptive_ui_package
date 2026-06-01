@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
+import '../theme/adaptive_theme_provider.dart';
 
 /// Item per il dropdown
 class AdaptiveDropdownItem<T> {
@@ -49,14 +50,12 @@ class AdaptiveDropdown<T> extends StatelessWidget {
     final TextStyle? defaultStyle =
         textStyle ?? Theme.of(context).textTheme.bodyMedium;
     if (isIOS) {
+      final inputStyles = AdaptiveThemeProvider.inputStylesOf(context);
       return GestureDetector(
         onTap: () => _showIOSPicker(context, defaultStyle),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          decoration: BoxDecoration(
-            color: CupertinoColors.tertiarySystemBackground,
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: inputStyles.toCupertinoDecoration(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
