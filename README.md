@@ -78,6 +78,45 @@ class MyApp extends StatelessWidget {
 }
 ```
 
+### 1b. Navigator 2.0 / router (go_router)
+
+`AdaptiveApp.router` supporta Navigator 2.0 mantenendo piena retro-compatibilità
+con l'API basata su `home:` + `routes:`. Accetta un `RouterConfig<Object>`
+(soddisfatto da un `GoRouter`) e costruisce internamente `MaterialApp.router`
+su Android e `CupertinoApp.router` su iOS, inoltrando theming e localizzazione
+esattamente come il costruttore di default.
+
+Aggiungi `go_router` alle dipendenze (`flutter pub add go_router`), poi:
+
+```dart
+import 'package:adaptive_ui/adaptive_ui.dart';
+import 'package:go_router/go_router.dart';
+
+final _router = GoRouter(
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => const HomePage()),
+    GoRoute(path: '/details', builder: (context, state) => const DetailsPage()),
+  ],
+);
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AdaptiveApp.router(
+      title: 'My App',
+      routerConfig: _router,
+      // theming e localizzazione identici al costruttore di default:
+      colors: ThemeColors.defaultColors,
+      themeMode: ThemeMode.system,
+    );
+  }
+}
+```
+
+Per navigare: `context.go('/details')`.
+
 ### 2. Usare i Widget Adattivi
 
 ```dart

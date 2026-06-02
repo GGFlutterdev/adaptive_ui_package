@@ -12,7 +12,10 @@ import '../theme/adaptive_theme_provider.dart';
 /// `Adaptive*` widget tramite [AdaptiveThemeProvider].
 class AdaptiveApp extends StatelessWidget {
   final String title;
-  final Widget home;
+
+  /// Widget radice nel ramo Navigator 1.0. Null quando si usa
+  /// [AdaptiveApp.router] (Navigator 2.0).
+  final Widget? home;
 
   // --- Token della light mode (compatibilità con l'API precedente) ---
   final ThemeColors colors;
@@ -49,6 +52,13 @@ class AdaptiveApp extends StatelessWidget {
   final Map<String, WidgetBuilder>? routes;
   final bool debugShowCheckedModeBanner;
 
+  /// Configurazione del router per Navigator 2.0 (es. `GoRouter`).
+  ///
+  /// Quando non è null, l'app interna viene costruita con
+  /// `MaterialApp.router`/`CupertinoApp.router` e i parametri [home]/[routes]
+  /// non vengono usati. Si imposta tramite il costruttore [AdaptiveApp.router].
+  final RouterConfig<Object>? routerConfig;
+
   const AdaptiveApp({
     Key? key,
     required this.title,
@@ -72,7 +82,44 @@ class AdaptiveApp extends StatelessWidget {
     this.locale,
     this.routes,
     this.debugShowCheckedModeBanner = true,
-  }) : super(key: key);
+  })  : routerConfig = null,
+        // Esattamente uno tra `home` e `routerConfig`: in questo ramo
+        // `routerConfig` è sempre null, quindi `home` deve essere fornito.
+        assert(home != null,
+            'AdaptiveApp richiede `home`; usa AdaptiveApp.router per il router.'),
+        super(key: key);
+
+  /// Costruttore per Navigator 2.0 / router (es. `go_router`).
+  ///
+  /// Richiede un [routerConfig] (tipicamente un `GoRouter`) e non accetta
+  /// [home]/[routes]. Mantiene invariati tutti i parametri di tema,
+  /// localizzazione e titolo del costruttore di default.
+  const AdaptiveApp.router({
+    Key? key,
+    required this.title,
+    required RouterConfig<Object> routerConfig,
+    this.colors = ThemeColors.defaultColors,
+    this.textTheme = TextThemeConfig.defaultConfig,
+    this.buttonStyles,
+    this.cupertinoButtonStyles = CupertinoButtonStyles.defaultStyles,
+    this.inputStyles = const InputStyles(
+      label: TextStyle(fontSize: 14, color: Colors.grey),
+      hint: TextStyle(fontSize: 14, color: Colors.grey),
+      border: OutlineInputBorder(),
+      focusedBorder: OutlineInputBorder(),
+    ),
+    this.spacing = Spacing.defaultSpacing,
+    this.theme,
+    this.darkTheme,
+    this.themeMode = ThemeMode.system,
+    this.localizationsDelegates,
+    this.supportedLocales = const <Locale>[Locale('en', 'US')],
+    this.locale,
+    this.debugShowCheckedModeBanner = true,
+  })  : home = null,
+        routes = null,
+        routerConfig = routerConfig,
+        super(key: key);
 
   static bool get isIOS => Platform.isIOS;
   static bool get isAndroid => Platform.isAndroid;
@@ -117,6 +164,28 @@ class AdaptiveApp extends StatelessWidget {
   }
 
   Widget _buildMaterialApp() {
+    Widget materialBuilder(BuildContext context, Widget? child) {
+      return AdaptiveThemeProvider(
+        data: _activeData(context),
+        child: child ?? const SizedBox.shrink(),
+      );
+    }
+
+    if (routerConfig != null) {
+      return MaterialApp.router(
+        title: title,
+        debugShowCheckedModeBanner: debugShowCheckedModeBanner,
+        theme: _buildMaterialTheme(_lightData),
+        darkTheme: _buildMaterialTheme(_darkData),
+        themeMode: themeMode,
+        localizationsDelegates: localizationsDelegates,
+        supportedLocales: supportedLocales,
+        locale: locale,
+        builder: materialBuilder,
+        routerConfig: routerConfig,
+      );
+    }
+
     return MaterialApp(
       title: title,
       debugShowCheckedModeBanner: debugShowCheckedModeBanner,
@@ -126,57 +195,69 @@ class AdaptiveApp extends StatelessWidget {
       localizationsDelegates: localizationsDelegates,
       supportedLocales: supportedLocales,
       locale: locale,
-      builder: (context, child) {
-        return AdaptiveThemeProvider(
-          data: _activeData(context),
-          child: child ?? const SizedBox.shrink(),
-        );
-      },
+      builder: materialBuilder,
       home: home,
       routes: routes ?? {},
     );
   }
 
   Widget _buildCupertinoApp() {
+    // brightness null in modalità "system" così Cupertino segue il sistema.
+    final cupertinoAppTheme = CupertinoThemeData(
+      brightness: themeMode == ThemeMode.system
+          ? null
+          : (themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light),
+      primaryColor: _lightData.colors.primary,
+    );
+
+    // Accoda i delegate di default: senza questi i widget Material aperti
+    // come route (dialog, bottom sheet, selection controls dei TextField)
+    // vanno in crash con "No MaterialLocalizations found" su iOS.
+    // I duplicati di tipo non danno problemi: vince il primo delegate.
+    final delegates = <LocalizationsDelegate<dynamic>>[
+      ...?localizationsDelegates,
+      DefaultMaterialLocalizations.delegate,
+      DefaultCupertinoLocalizations.delegate,
+      DefaultWidgetsLocalizations.delegate,
+    ];
+
+    Widget cupertinoBuilder(BuildContext context, Widget? child) {
+      final active = _activeData(context);
+      return AdaptiveThemeProvider(
+        data: active,
+        child: CupertinoTheme(
+          data: _buildCupertinoTheme(active),
+          // CupertinoApp non fornisce uno ScaffoldMessenger: senza, gli
+          // SnackBar Material falliscono su iOS. Lo aggiungiamo qui, sopra
+          // il Navigator radice, una volta per tutte le route.
+          child: ScaffoldMessenger(
+            child: child ?? const SizedBox.shrink(),
+          ),
+        ),
+      );
+    }
+
+    if (routerConfig != null) {
+      return CupertinoApp.router(
+        title: title,
+        debugShowCheckedModeBanner: debugShowCheckedModeBanner,
+        theme: cupertinoAppTheme,
+        localizationsDelegates: delegates,
+        supportedLocales: supportedLocales,
+        locale: locale,
+        builder: cupertinoBuilder,
+        routerConfig: routerConfig,
+      );
+    }
+
     return CupertinoApp(
       title: title,
       debugShowCheckedModeBanner: debugShowCheckedModeBanner,
-      // brightness null in modalità "system" così Cupertino segue il sistema.
-      theme: CupertinoThemeData(
-        brightness: themeMode == ThemeMode.system
-            ? null
-            : (themeMode == ThemeMode.dark
-                ? Brightness.dark
-                : Brightness.light),
-        primaryColor: _lightData.colors.primary,
-      ),
-      // Accoda i delegate di default: senza questi i widget Material aperti
-      // come route (dialog, bottom sheet, selection controls dei TextField)
-      // vanno in crash con "No MaterialLocalizations found" su iOS.
-      // I duplicati di tipo non danno problemi: vince il primo delegate.
-      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-        ...?localizationsDelegates,
-        DefaultMaterialLocalizations.delegate,
-        DefaultCupertinoLocalizations.delegate,
-        DefaultWidgetsLocalizations.delegate,
-      ],
+      theme: cupertinoAppTheme,
+      localizationsDelegates: delegates,
       supportedLocales: supportedLocales,
       locale: locale,
-      builder: (context, child) {
-        final active = _activeData(context);
-        return AdaptiveThemeProvider(
-          data: active,
-          child: CupertinoTheme(
-            data: _buildCupertinoTheme(active),
-            // CupertinoApp non fornisce uno ScaffoldMessenger: senza, gli
-            // SnackBar Material falliscono su iOS. Lo aggiungiamo qui, sopra
-            // il Navigator radice, una volta per tutte le route.
-            child: ScaffoldMessenger(
-              child: child ?? const SizedBox.shrink(),
-            ),
-          ),
-        );
-      },
+      builder: cupertinoBuilder,
       home: home,
       routes: routes ?? {},
     );

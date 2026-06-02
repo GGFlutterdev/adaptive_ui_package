@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-06-02 - Supporto Navigator 2.0 / router
+
+### Added
+- `AdaptiveApp.router({ required routerConfig, ... })`: nuovo costruttore per Navigator 2.0 / router (es. `go_router`). Accetta un `RouterConfig<Object>` (soddisfatto da un `GoRouter`) e costruisce internamente `MaterialApp.router` (Android) o `CupertinoApp.router` (iOS).
+- `AdaptiveApp.routerConfig`: nuovo campo opzionale che espone la configurazione del router.
+
+### Changed
+- `AdaptiveApp.home` è ora opzionale (`Widget?`): resta `required` nel costruttore di default ma può essere omesso usando `AdaptiveApp.router`. Un `assert` garantisce che venga fornito esattamente uno tra `home` e `routerConfig`.
+- Tutto il theming (light/dark, `themeMode`, color theming), la localizzazione (`localizationsDelegates`, `supportedLocales`, `locale`), il `title`, il `debugShowCheckedModeBanner` e il wrapper `AdaptiveThemeProvider` vengono inoltrati identici sia nel ramo `home`/`routes` sia nel ramo `routerConfig`.
+
+### Compatibility
+- Retro-compatibilità totale: il codice esistente che usa `AdaptiveApp(home: ..., routes: ...)` continua a compilare e funzionare identico.
+
 ## [1.2.1] - 2026-06-01 - Fix localizzazioni Material su iOS
 
 ### Fixed
