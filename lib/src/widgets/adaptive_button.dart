@@ -113,6 +113,7 @@ class AdaptiveIconButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color? color;
   final double? size;
+  final String? tooltip;
 
   const AdaptiveIconButton({
     Key? key,
@@ -120,6 +121,7 @@ class AdaptiveIconButton extends StatelessWidget {
     required this.onPressed,
     this.color,
     this.size,
+    this.tooltip,
   }) : super(key: key);
 
   static bool get isIOS => Platform.isIOS;
@@ -128,7 +130,7 @@ class AdaptiveIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isIOS) {
       final accent = AdaptiveThemeProvider.colorsOf(context).primary;
-      return CupertinoButton(
+      final button = CupertinoButton(
         onPressed: onPressed,
         padding: EdgeInsets.zero,
         child: IconTheme(
@@ -139,12 +141,15 @@ class AdaptiveIconButton extends StatelessWidget {
           child: icon,
         ),
       );
+      // Cupertino non ha un tooltip nativo: lo aggiungiamo solo se richiesto.
+      return tooltip != null ? Tooltip(message: tooltip!, child: button) : button;
     } else {
       return IconButton(
         onPressed: onPressed,
         icon: icon,
         color: color,
         iconSize: size ?? 24,
+        tooltip: tooltip,
       );
     }
   }

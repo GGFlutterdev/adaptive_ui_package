@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-06-02 - Tooltip su AdaptiveIconButton
+
+### Added
+- `AdaptiveIconButton.tooltip`: nuovo parametro opzionale. Su Material viene inoltrato a `IconButton.tooltip`; su iOS il `CupertinoButton` viene avvolto in un `Tooltip` (solo se valorizzato, dato che Cupertino non ha un tooltip nativo).
+
+### Compatibility
+- Retro-compatibilità totale: il parametro è opzionale e non modifica il comportamento esistente.
+
 ## [1.3.0] - 2026-06-02 - Supporto Navigator 2.0 / router
 
 ### Added
