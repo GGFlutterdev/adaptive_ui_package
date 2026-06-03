@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-06-03 - Fix striscia bianca / gap superiore sui modal bottom sheet iOS
+
+### Fixed
+- `AdaptiveModalBottomSheet.show`: rimossa la striscia bianca / gap superiore sui modal bottom sheet iOS con child a sfondo custom. Lo sfondo opaco bianco (`CupertinoColors.systemBackground` non risolto) non viene più forzato sopra il `child`, e la `SafeArea` non applica più l'inset superiore (status bar) su un foglio ancorato in basso (`top: false`, `bottom` mantenuto per l'home indicator).
+
+### Added
+- `AdaptiveModalBottomSheet.show.backgroundColor`: nuovo parametro opzionale. Se `null` non viene disegnato alcuno sfondo opaco sopra il `child`; se valorizzato con un `CupertinoDynamicColor` viene risolto rispetto alla brightness reale del contesto. Propagato anche al ramo Android.
+- `AdaptiveModalBottomSheet.show.borderRadius`: nuovo parametro opzionale (`BorderRadiusGeometry?`, default `BorderRadius.vertical(top: Radius.circular(12))`) per evitare il doppio arrotondamento. Su Android viene applicato tramite `shape`.
+- `AdaptiveModalBottomSheet.show.useSafeArea`: nuovo flag opzionale (default `true`) per controllare l'avvolgimento del contenuto iOS in una `SafeArea`.
+
+### Compatibility
+- Retro-compatibilità totale: tutti i nuovi parametri sono opzionali e non modificano il comportamento delle chiamate esistenti.
+
 ## [1.3.1] - 2026-06-02 - Tooltip su AdaptiveIconButton
 
 ### Added
